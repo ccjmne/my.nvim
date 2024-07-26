@@ -105,6 +105,12 @@ return {
       },
     }
 
+    vim.fn.sign_define('DapBreakpoint', { text = 'B', texthl = 'DapBreakpoint' })
+    vim.fn.sign_define('DapBreakpointCondition', { text = 'C', texthl = 'DapBreakpointCondition' })
+    vim.fn.sign_define('DapBreakpointRejected', { text = 'R', texthl = 'DapBreakpointRejected' })
+    vim.fn.sign_define('DapLogPoint', { text = 'L', texthl = 'DapLogPoint' })
+    vim.fn.sign_define('DapStopped', { text = '>', texthl = 'DapStopped' })
+
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     vim.keymap.set('n', '<F7>', dapui.toggle, { desc = 'Debug: See last session result.' })
 
