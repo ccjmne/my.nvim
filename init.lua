@@ -384,9 +384,18 @@ require('lazy').setup({
         --
         -- layout_config = { anchor = 'N' },
         defaults = {
+          results_title = false,
           -- mappings = {
           --   i = { ['<c-space>'] = 'to_fuzzy_refine' },
           -- },
+          borderchars = {
+            -- prompt = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+            -- results = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+            -- preview = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+            prompt = { '▀', '▐', '▄', '▌', '▛', '▜', '▟', '▙' },
+            results = { '▀', '▐', '▄', '▌', '▛', '▜', '▟', '▙' },
+            preview = { '▀', '▐', '▄', '▌', '▛', '▜', '▟', '▙' },
+          },
           path_display = { 'smart' },
           -- sorting_strategy = 'bottom', -- display results top->bottom
           -- layout_config = {
@@ -408,18 +417,19 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', function()
-        builtin.find_files { previewer = true } --{ layout_config = { prompt_position = 'top' } }
-      end, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+
+      -- stylua: ignore start
+      vim.keymap.set('n', '<leader>sh', function() builtin.help_tags { preview_title = '' } end, { desc = '[S]earch [H]elp' })
+      vim.keymap.set('n', '<leader>sk', function() builtin.keymaps { preview_title = '' } end, { desc = '[S]earch [K]eymaps' })
+      vim.keymap.set('n', '<leader>sf', function() builtin.find_files { preview_title = '' } end, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>ss', function() builtin.builtin { preview_title = '' } end, { desc = '[S]earch [S]elect Telescope' })
+      vim.keymap.set('n', '<leader>sw', function() builtin.grep_string { preview_title = '' } end, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set('n', '<leader>sg', function() builtin.live_grep { preview_title = '' } end, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sd', function() builtin.diagnostics { preview_title = '' } end, { desc = '[S]earch [D]iagnostics' })
+      vim.keymap.set('n', '<leader>sr', function() builtin.resume { preview_title = '' } end, { desc = '[S]earch [R]esume' })
+      vim.keymap.set('n', '<leader>s-', function() builtin.oldfiles { preview_title = '' } end, { desc = '[S]earch Recent Files' })
+      vim.keymap.set('n', '<leader><leader>', function() builtin.buffers { preview_title = '' } end, { desc = '[ ] Find existing buffers' })
+      -- stylua: ignore end
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -441,7 +451,7 @@ require('lazy').setup({
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
+        builtin.find_files { cwd = vim.fn.stdpath 'config', preview_title = '' }
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
@@ -869,7 +879,15 @@ require('lazy').setup({
     end,
     opts = {
       custom_highlights = function(colors)
-        return { LineNr = { fg = colors.overlay1 } }
+        return {
+          LineNr = { fg = colors.overlay2 },
+          TelescopeBorder = { fg = colors.surface0 },
+          TelescopePromptBorder = { fg = colors.surface2 },
+          TelescopeTitle = { fg = colors.blue },
+          TelescopePromptPrefix = { fg = colors.blue },
+          TelescopeSelectionCaret = { fg = colors.yellow, bg = colors.surface0 },
+          TelescopeMultiSelection = { fg = colors.yellow },
+        }
       end,
       show_end_of_buffer = true,
       default_integrations = true,
