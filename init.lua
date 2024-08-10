@@ -431,6 +431,13 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', function() builtin.buffers { preview_title = '' } end, { desc = '[ ] Find existing buffers' })
       -- stylua: ignore end
 
+      vim.keymap.set('n', '<leader>s.f', function()
+        builtin.find_files { find_command = { 'rg', '--files', '--hidden', '--glob=!.git' } }
+      end, { desc = '[S]earch [.]idden [F]iles' })
+      vim.keymap.set('n', '<leader>s.g', function()
+        builtin.live_grep { additional_args = { '--hidden', '--glob=!.git' }, preview_title = '' }
+      end, { desc = '[S]earch [.]idden files by [G]rep' })
+
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
