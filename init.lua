@@ -214,10 +214,11 @@ require('lazy').setup({
 
   {
     'stevearc/oil.nvim',
-    opts = {
-      columns = { 'icon', 'size', 'mtime' },
-    },
     -- dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    config = function()
+      require('oil').setup { columns = { 'icon', 'size' } }
+      vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+    end,
   },
 
   {
@@ -404,7 +405,6 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
 
-      vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
