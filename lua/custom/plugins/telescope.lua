@@ -131,5 +131,10 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set('n', '<leader>sn', function()
       builtin.find_files { cwd = vim.fn.stdpath 'config', preview_title = '' }
     end, { desc = '[S]earch [N]eovim files' })
+
+    vim.keymap.set('n', '<leader>sm', function()
+      -- TODO: figure out an elegant way to not have this hard-coded
+      builtin.find_files { cwd = vim.env.HOME .. '/git/dotfiles', preview_title = '', find_command = { 'rg', '--files', '--hidden', '--glob=!.git' } }
+    end, { desc = '[S]earch [M]y dotfiles' })
   end,
 }
