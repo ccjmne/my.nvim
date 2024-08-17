@@ -704,11 +704,11 @@ require('lazy').setup({
         return {
           LineNr = { fg = colors.overlay2 },
           TelescopeBorder = { fg = colors.surface0 },
+          TelescopeMultiSelection = { fg = colors.yellow },
           TelescopePromptBorder = { fg = colors.surface2 },
-          TelescopeTitle = { fg = colors.blue },
           TelescopePromptPrefix = { fg = colors.blue },
           TelescopeSelectionCaret = { fg = colors.yellow, bg = colors.surface0 },
-          TelescopeMultiSelection = { fg = colors.yellow },
+          TelescopeTitle = { fg = colors.blue },
         }
       end,
       show_end_of_buffer = true,
