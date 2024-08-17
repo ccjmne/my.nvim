@@ -546,6 +546,7 @@ require('lazy').setup({
     init = function()
       vim.keymap.set('n', '<leader>tf', function()
         vim.g.disable_autoformat = not vim.g.disable_autoformat
+        print('Auto-format ' .. (vim.g.disable_autoformat and 'disabled' or 'enabled'))
       end, { desc = '[T]oggle [F]ormat on save' })
     end,
     opts = {
