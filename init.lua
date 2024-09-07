@@ -216,7 +216,12 @@ require('lazy').setup({
     'stevearc/oil.nvim',
     -- dependencies = { { 'echasnovski/mini.icons', opts = {} } },
     config = function()
-      require('oil').setup { columns = { 'icon', 'size' } }
+      require('oil').setup {
+        columns = { 'icon', 'size' },
+        keymaps = {
+          ['gq'] = 'actions.close',
+        },
+      }
       vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
     end,
   },
