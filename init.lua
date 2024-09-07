@@ -703,6 +703,7 @@ require('lazy').setup({
       custom_highlights = function(colors)
         return {
           LineNr = { fg = colors.overlay2 },
+          MiniTrailspace = { fg = colors.surface0, bg = colors.red },
           TelescopeBorder = { fg = colors.surface0 },
           TelescopeMultiSelection = { fg = colors.yellow },
           TelescopePromptBorder = { fg = colors.surface2 },
