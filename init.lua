@@ -215,6 +215,12 @@ require('lazy').setup({
   'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
 
   {
+    'mbbill/undotree',
+    event = 'VeryLazy',
+    vim.keymap.set('n', '<leader>tu', '<CMD>UndotreeToggle<CR>', { desc = 'Toggle Undotree' }),
+  },
+
+  {
     'stevearc/oil.nvim',
     -- dependencies = { { 'echasnovski/mini.icons', opts = {} } },
     config = function()
