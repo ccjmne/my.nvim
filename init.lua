@@ -218,6 +218,12 @@ require('lazy').setup({
     'mbbill/undotree',
     event = 'VeryLazy',
     vim.keymap.set('n', '<leader>tu', '<CMD>UndotreeToggle<CR>', { desc = 'Toggle Undotree' }),
+    config = function()
+      vim.g.undotree_WindowLayout = 1
+      vim.g.undotree_DiffAutoOpen = 0
+      vim.g.undotree_SetFocusWhenToggle = 1
+      vim.g.undotree_HelpLine = 0
+    end,
   },
 
   {
