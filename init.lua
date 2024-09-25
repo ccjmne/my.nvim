@@ -223,6 +223,12 @@ require('lazy').setup({
       vim.g.undotree_DiffAutoOpen = 0
       vim.g.undotree_SetFocusWhenToggle = 1
       vim.g.undotree_HelpLine = 0
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'undotree' },
+        callback = function()
+          vim.keymap.set('n', 'gq', '<CMD>UndotreeToggle<CR>', { buffer = 0 })
+        end,
+      })
     end,
   },
 
