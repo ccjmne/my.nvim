@@ -237,7 +237,7 @@ require('lazy').setup({
     -- dependencies = { { 'echasnovski/mini.icons', opts = {} } },
     config = function()
       require('oil').setup {
-        columns = { 'icon', 'size' },
+        columns = { 'icon', 'permissions', 'size' },
         keymaps = {
           ['gq'] = 'actions.close',
         },
