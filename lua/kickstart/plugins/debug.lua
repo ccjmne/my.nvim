@@ -34,7 +34,7 @@ return {
       { '<F2>', dap.step_into, desc = 'Debug: Step Into' },
       { '<F3>', dap.step_over, desc = 'Debug: Step Over' },
       { '<F4>', dap.step_out, desc = 'Debug: Step Out' },
-      { '<leader>b', dap.ggle_breakpoint, desc = 'Debug: Toggle Breakpoint' },
+      { '<leader>b', dap.toggle_breakpoint, desc = 'Debug: Toggle Breakpoint' },
       {
         '<leader>B',
         function()
