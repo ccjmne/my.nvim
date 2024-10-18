@@ -215,6 +215,18 @@ require('lazy').setup({
   'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
 
   {
+    'Wansmer/treesj',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    keys = { -- Lazily load plugin, which takes up to ~30ms
+      { 'gS', '<Cmd>TSJSplit<CR>', desc = 'Split TSNode' },
+      { 'gJ', '<Cmd>TSJJoin<CR>', desc = 'Join TSNode' },
+    },
+    config = function()
+      require('treesj').setup { use_default_keymaps = false, max_join_length = 150 }
+    end,
+  },
+
+  {
     'mbbill/undotree',
     event = 'VeryLazy',
     vim.keymap.set('n', '<leader>tu', '<CMD>UndotreeToggle<CR>', { desc = 'Toggle Undotree' }),
