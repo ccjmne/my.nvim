@@ -128,7 +128,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', precedes = '🢐', extends = '🢒' }
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', precedes = '<', extends = '>' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -816,9 +816,12 @@ require('lazy').setup({
       vim.cmd.colorscheme 'catppuccin'
     end,
     opts = {
+      -- Use colors.none to revert something's colour
+      -- See available colours at: https://github.com/catppuccin/nvim/blob/main/lua/catppuccin/palettes/mocha.lua
       custom_highlights = function(colors)
         return {
           LineNr = { fg = colors.overlay2 },
+          NonText = { fg = colors.mantle, bg = colors.text },
           MiniTrailspace = { fg = colors.surface0, bg = colors.red },
           TelescopeBorder = { fg = colors.surface0 },
           TelescopeMultiSelection = { fg = colors.yellow },
