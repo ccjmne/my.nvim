@@ -840,6 +840,13 @@ require('lazy').setup({
 
       require('mini.trailspace').setup()
 
+      local MiniDiff = require 'mini.diff'
+      MiniDiff.setup {
+        -- 'myers'|'minimal'|'patience'|'histogram'
+        options = { algorithm = 'myers' },
+      }
+      vim.keymap.set('n', '<leader>td', MiniDiff.toggle_overlay, { desc = 'MiniDiff: Toggle Overlay' })
+
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
