@@ -1067,6 +1067,27 @@ require('lazy').setup({
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
+  {
+    'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
+    config = function()
+      require('lsp_lines').setup()
+    end,
+    keys = function(_, keys)
+      local inline = true
+      return {
+        {
+          '<leader>tq',
+          function()
+            inline = not inline
+            vim.diagnostic.config { virtual_text = inline, virtual_lines = not inline }
+          end,
+          desc = '[T]oggle Diagnostics Style',
+        },
+        unpack(keys),
+      }
+    end,
+  },
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
