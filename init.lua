@@ -219,8 +219,6 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
-  'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
-
   {
     'Wansmer/treesj',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
@@ -337,25 +335,6 @@ require('lazy').setup({
           require('leap.remote').action { input = tobj }
         end)
       end
-    end,
-  },
-
-  {
-    'rbong/vim-flog',
-    lazy = true,
-    cmd = { 'Flog', 'Flogsplit', 'Floggit' },
-    dependencies = {
-      'tpope/vim-fugitive',
-    },
-    config = function()
-      vim.g.flog_permanent_default_opts = { max_count = 2000 }
-      -- See https://github.com/rbong/vim-flog/issues/142
-      vim.api.nvim_create_autocmd('User', {
-        pattern = { 'FlogUpdate' },
-        callback = function()
-          require('mini.trailspace').unhighlight()
-        end,
-      })
     end,
   },
 
