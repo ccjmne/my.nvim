@@ -1067,17 +1067,6 @@ require('lazy').setup({
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
-  {
-    'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
-    config = function()
-      require('lsp_lines').setup()
-      vim.diagnostic.config {
-        virtual_text = false,
-        virtual_lines = { only_current_line = false, highlight_whole_line = false },
-      } -- TODO: Check whether I can display the diagnostic source tool
-    end,
-  },
-
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
