@@ -1,3 +1,6 @@
+vim.env.VIM = '/usr/bin/nvim'
+vim.env.PATH = '/usr/local/bin/gpg:' .. vim.env.PATH
+
 --[[
 
 What is Kickstart?
@@ -172,6 +175,9 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- vim.keymap.set('n', '<C-u>', '<C-u>zz', { noremap = true, desc = 'Scroll Up and center' })
+-- vim.keymap.set('n', '<C-d>', '<C-d>zz', { noremap = true, desc = 'Scroll Down and center' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -212,7 +218,28 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
+
+  {
+    'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
+    config = function()
+      -- Define a toggle function for a detailed Fugitive commit view
+      vim.api.nvim_set_keymap('n', '<leader>gd', ':lua ToggleFugitiveDetailedView()<CR>', { noremap = true, silent = true })
+
+      function ToggleFugitiveDetailedView()
+        local current_buf = vim.fn.bufname '%'
+        -- Only apply if currently in a Fugitive buffer showing a commit
+        if current_buf:match '^fugitive://' then
+          -- Retrieve the current commit hash
+          local commit_hash = vim.fn.expand '%:t' -- Gets the file part of the fugitive buffer (commit hash)
+          print(commit_hash)
+          -- Reopen the same commit with additional signature and metadata details
+          vim.cmd('Gedit ' .. commit_hash .. ' --show-signature')
+        else
+          print 'Not in a Fugitive commit view.'
+        end
+      end
+    end,
+  },
 
   {
     'Wansmer/treesj',
@@ -227,6 +254,132 @@ require('lazy').setup({
   },
 
   {
+    'ggandor/leap.nvim',
+    config = function()
+      -- TODO: Use the more idiomatic Lazy "keys" and stuff, see https://github.com/ggandor/leap.nvim/issues/246
+      vim.keymap.set({ 'n', 'x', 'o' }, 'ss', '<Plug>(leap)')
+      require('leap').opts.safe_labels = {}
+      require('leap').opts.preview_filter = function()
+        return false
+      end
+      vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' })
+      -- The below settings make Leap's highlighting closer to what you've been
+      -- used to in Lightspeed.
+
+      vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' }) -- or some grey
+      -- vim.api.nvim_set_hl(0, 'LeapMatch', {
+      --   -- For light themes, set to 'black' or similar.
+      --   fg = 'white',
+      --   bold = true,
+      --   nocombine = true,
+      -- })
+
+      -- Deprecated option. Try it without this setting first, you might find
+      -- you don't even miss it.
+      -- require('leap').opts.highlight_unlabeled_phase_one_targets = true
+      require('leap').opts.equivalence_classes = {
+        ' \t\r\n',
+        'aäàáâãā',
+        'dḍ',
+        'eëéèêē',
+        'gǧğ',
+        'hḥḫ',
+        'iïīíìîı',
+        'nñ',
+        'oō',
+        'sṣšß',
+        'tṭ',
+        'uúûüűū',
+        'zẓ',
+        '([{',
+        ')]}',
+        '\'"`',
+      }
+      -- If using the default mappings (`gs` for multi-window mode), you can
+      -- map e.g. `gS` here.
+      vim.keymap.set({ 'n', 'o' }, 'gs', function()
+        require('leap.remote').action()
+      end)
+
+      vim.api.nvim_create_augroup('LeapRemote', {})
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'RemoteOperationDone',
+        group = 'LeapRemote',
+        callback = function(event)
+          -- Do not paste if some special register was in use.
+          if vim.v.operator == 'y' and event.data.register == '"' then
+            vim.cmd 'normal! P'
+          end
+        end,
+      })
+      local default_text_objects = {
+        'iw',
+        'iW',
+        'is',
+        'ip',
+        'i[',
+        'i]',
+        'i(',
+        'i)',
+        'ib',
+        'i>',
+        'i<',
+        'it',
+        'i{',
+        'i}',
+        'iB',
+        'i"',
+        "i'",
+        'i`',
+        'aw',
+        'aW',
+        'as',
+        'ap',
+        'a[',
+        'a]',
+        'a(',
+        'a)',
+        'ab',
+        'a>',
+        'a<',
+        'at',
+        'a{',
+        'a}',
+        'aB',
+        'a"',
+        "a'",
+        'a`',
+      }
+      -- Create remote versions of all native text objects by inserting `r`
+      -- into the middle (`iw` becomes `irw`, etc.):
+      for _, tobj in ipairs(default_text_objects) do
+        vim.keymap.set({ 'x', 'o' }, tobj:sub(1, 1) .. 'r' .. tobj:sub(2), function()
+          require('leap.remote').action { input = tobj }
+        end)
+      end
+    end,
+  },
+
+  {
+    'rbong/vim-flog',
+    lazy = true,
+    cmd = { 'Flog', 'Flogsplit', 'Floggit' },
+    dependencies = {
+      'tpope/vim-fugitive',
+    },
+    config = function()
+      vim.g.flog_permanent_default_opts = { max_count = 2000 }
+      -- See https://github.com/rbong/vim-flog/issues/142
+      vim.api.nvim_create_autocmd('User', {
+        pattern = { 'FlogUpdate' },
+        callback = function()
+          require('mini.trailspace').unhighlight()
+        end,
+      })
+    end,
+  },
+
+  {
     'mbbill/undotree',
     event = 'VeryLazy',
     vim.keymap.set('n', '<leader>tu', '<CMD>UndotreeToggle<CR>', { desc = 'Toggle Undotree' }),
@@ -235,6 +388,8 @@ require('lazy').setup({
       vim.g.undotree_DiffAutoOpen = 0
       vim.g.undotree_SetFocusWhenToggle = 1
       vim.g.undotree_HelpLine = 0
+      vim.g.undotree_DiffCommand = 'git diff --no-index'
+      vim.g.undotree_SplitWidth = 30
       vim.api.nvim_create_autocmd('FileType', {
         pattern = { 'undotree' },
         callback = function()
@@ -268,6 +423,7 @@ require('lazy').setup({
       end
 
       oil.setup {
+        skip_confirm_for_simple_edits = true,
         columns = { 'icon' },
         keymaps = {
           ['gq'] = 'actions.close',
@@ -296,10 +452,18 @@ require('lazy').setup({
   },
 
   {
-    -- wtf is this?! Did I really install this?!
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
+    opts = {
+      settings = {
+        tsserver_format_options = {
+          -- See https://github.com/microsoft/TypeScript/blob/v5.0.4/src/server/protocol.ts
+          semicolons = 'remove',
+          indentSize = 2, -- For some reason, it detects the indentSize (very) wrongly on any typescript buffer after the first?!
+          baseindentSize = 2,
+        },
+      },
+    },
   },
 
   -- NOTE: Plugins can also be added by using a table,
@@ -378,7 +542,7 @@ require('lazy').setup({
     },
   },
 
-  { 'nvim-java/nvim-java' },
+  { 'nvim-java/nvim-java', ft = 'java' },
 
   {
     -- Garbage collector that stops inactive LSP clients to free RAM
@@ -401,7 +565,9 @@ require('lazy').setup({
       },
     },
   },
+
   { 'Bilal2453/luvit-meta', lazy = true },
+
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -571,6 +737,16 @@ require('lazy').setup({
         -- ts_ls = {},
         --
 
+        rust_analyzer = {
+          settings = {
+            ['rust_analyzer'] = {
+              checkOnSave = {
+                command = 'clippy',
+              },
+            },
+          },
+        },
+
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -600,8 +776,28 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'lemminx', -- xml support
+        -- 'eslint',
+        -- 'harper-ls',
+        'java-debug-adapter',
+        -- 'java-test',
+        -- 'jdtls',
+        -- 'js-debug-adapter',
+        -- 'lombok-nightly',
+        -- 'lua-language-server',
+        -- 'openjdk-17',
+        -- 'rust-analyzer rust_analyzer',
+        -- 'spring-boot-tools',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      -- require('lspconfig').eslint.setup {
+      --   on_attach = function(client, bufnr)
+      --     vim.api.nvim_create_autocmd('BufWritePre', {
+      --       buffer = bufnr,
+      --       command = 'EslintFixAll',
+      --     })
+      --   end,
+      -- }
 
       require('mason-lspconfig').setup {
         handlers = {
@@ -635,13 +831,22 @@ require('lazy').setup({
         mode = '',
         desc = '[F]ormat buffer',
       },
+      {
+        '<leader>tf',
+        function()
+          vim.g.disable_autoformat = not vim.g.disable_autoformat
+          print('Format-on-save ' .. (vim.g.disable_autoformat and 'disabled' or 'enabled'))
+        end,
+        mode = '',
+        desc = '[T]oggle [F]ormat on save',
+      },
     },
-    init = function()
-      vim.keymap.set('n', '<leader>tf', function()
-        vim.g.disable_autoformat = not vim.g.disable_autoformat
-        print('Auto-format ' .. (vim.g.disable_autoformat and 'disabled' or 'enabled'))
-      end, { desc = '[T]oggle [F]ormat on save' })
-    end,
+    -- init = function()
+    --   vim.keymap.set('n', '<leader>tf', function()
+    --     vim.g.disable_autoformat = not vim.g.disable_autoformat
+    --     print('Format-on-save ' .. (vim.g.disable_autoformat and 'disabled' or 'enabled'))
+    --   end, { desc = '[T]oggle [F]ormat on save' })
+    -- end,
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
@@ -695,12 +900,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -717,6 +922,57 @@ require('lazy').setup({
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
 
+      -- local emojis = {}
+      -- emojis.new = function()
+      --   setmetatable({}, { __index = emojis })
+      -- end
+      -- emojis.get_trigger_characters = function()
+      --   return { '/' }
+      -- end
+      -- emojis.complete = function(self, request, callback)
+      --   local input = string.sub(request.context.cursor_before_line, request.offset - 1)
+      --   local prefix = string.sub(request.context.cursor_before_line, 1, request.offset - 1)
+      --
+      --   if vim.startswith(input, '/') and (prefix == '/' or vim.endswith(prefix, ' /')) then
+      --     local items = {
+      --       {
+      --         label = 'shrug',
+      --         textEdit = {
+      --           newText = '¯\\_(ツ)_/¯',
+      --           range = {
+      --             start = { line = request.context.cursor.row - 1, character = request.context.cursor.col - 1 - #input },
+      --             ['end'] = { line = request.context.cursor.row - 1, character = request.context.cursor.col - 1 },
+      --           },
+      --         },
+      --       },
+      --       {
+      --         label = 'flip',
+      --         textEdit = {
+      --           newText = '(╯°□°)╯︵ ┻━┻',
+      --           range = {
+      --             start = { line = request.context.cursor.row - 1, character = request.context.cursor.col - 1 - #input },
+      --             ['end'] = { line = request.context.cursor.row - 1, character = request.context.cursor.col - 1 },
+      --           },
+      --         },
+      --       },
+      --       {
+      --         label = 'unflip',
+      --         textEdit = {
+      --           newText = '┬─┬ノ( º _ ºノ)',
+      --           range = {
+      --             start = { line = request.context.cursor.row - 1, character = request.context.cursor.col - 1 - #input },
+      --             ['end'] = { line = request.context.cursor.row - 1, character = request.context.cursor.col - 1 },
+      --           },
+      --         },
+      --       },
+      --     }
+      --     callback { items = items, isIncomplete = true }
+      --   else
+      --     callback { isIncomplete = false }
+      --   end
+      -- end
+      -- cmp.register_source('emojis', emojis)
+      --
       cmp.setup {
         snippet = {
           expand = function(args)
@@ -786,8 +1042,20 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          -- { name = 'emojis' },
         },
       }
+    end,
+  },
+
+  {
+    'petertriho/cmp-git',
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    opts = {
+      -- options go here
+    },
+    init = function()
+      table.insert(require('cmp').get_config().sources, { name = 'git' })
     end,
   },
 
@@ -802,6 +1070,9 @@ require('lazy').setup({
       -- Use colors.none to revert something's colour
       -- See available colours at: https://github.com/catppuccin/nvim/blob/main/lua/catppuccin/palettes/mocha.lua
       custom_highlights = function(colors)
+        -- C = require('catppuccin.palettes').get_palette 'mocha'
+        -- U = require 'catppuccin.utils.colors'
+
         return {
           LineNr = { fg = colors.overlay2 },
           NonText = { fg = colors.mantle, bg = colors.text },
@@ -812,15 +1083,58 @@ require('lazy').setup({
           TelescopePromptPrefix = { fg = colors.blue },
           TelescopeSelectionCaret = { fg = colors.yellow, bg = colors.surface0 },
           TelescopeTitle = { fg = colors.blue },
+
+          -- TelescopeBorder = { fg = colors.surface0, bg = colors.surface0 },
+          -- TelescopePromptBorder = { fg = colors.surface0, bg = colors.surface0 },
+          -- TelescopePromptNormal = { bg = colors.surface0 },
+          -- TelescopePromptPrefix = { fg = colors.mauve, bg = colors.surface0 },
+          -- TelescopePreviewTitle = { fg = colors.surface0, bg = colors.surface0 },
+          -- TelescopePromptTitle = { fg = colors.blue, bg = colors.surface0 },
+          -- TelescopeResultsTitle = { fg = colors.surface0, bg = colors.surface0 },
+          -- TelescopeSelection = { bg = colors.surface1 },
+
+          -- DiffAdd = { bg = U.darken(C.green, 0.50, C.base) },
+          -- DiffChange = { bg = U.darken(C.blue, 0.50, C.base) },
+          -- DiffDelete = { bg = U.darken(C.red, 0.50, C.base) },
+          -- DiffText = { bg = U.darken(C.blue, 0.50, C.base) },
         }
       end,
       show_end_of_buffer = true,
-      default_integrations = true,
+      -- default_integrations = true,
+      --
+      integrations = {
+        -- alpha = true,
+        -- aerial = true,
+        dap = true,
+        dap_ui = true,
+        mason = true,
+        -- neotree = true,
+        notify = true,
+        -- nvimtree = false,
+        semantic_tokens = true,
+        symbols_outline = true,
+        telescope = true,
+        -- ts_rainbow = false,
+        which_key = true,
+      },
     },
   },
 
+  { 'tomtom/tcomment_vim' },
+
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+
+  {
+    'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
+    config = function()
+      require('lsp_lines').setup()
+      vim.diagnostic.config {
+        virtual_text = false,
+        virtual_lines = { only_current_line = false, highlight_whole_line = false },
+      } -- TODO: Check whether I can display the diagnostic source tool
+    end,
+  },
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
@@ -840,12 +1154,15 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      require('mini.align').setup()
+
       require('mini.trailspace').setup()
 
       local MiniDiff = require 'mini.diff'
       MiniDiff.setup {
         -- 'myers'|'minimal'|'patience'|'histogram'
         options = { algorithm = 'myers' },
+        source = MiniDiff.gen_source.git(),
       }
       vim.keymap.set('n', '<leader>td', MiniDiff.toggle_overlay, { desc = 'MiniDiff: Toggle Overlay' })
 
@@ -869,31 +1186,31 @@ require('lazy').setup({
     end,
   },
 
-  { -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
-    -- There are additional nvim-treesitter modules that you can use to interact
-    -- with nvim-treesitter. You should go explore a few and see what interests you:
-    --
-    --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-    --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-    --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-  },
+  -- { -- Highlight, edit, and navigate code
+  --   'nvim-treesitter/nvim-treesitter',
+  --   build = ':TSUpdate',
+  --   main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+  --   -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+  --   opts = {
+  --     ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+  --     -- Autoinstall languages that are not installed
+  --     auto_install = true,
+  --     highlight = {
+  --       enable = true,
+  --       -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+  --       --  If you are experiencing weird indenting issues, add the language to
+  --       --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+  --       additional_vim_regex_highlighting = { 'ruby' },
+  --     },
+  --     indent = { enable = true, disable = { 'ruby' } },
+  --   },
+  --   -- There are additional nvim-treesitter modules that you can use to interact
+  --   -- with nvim-treesitter. You should go explore a few and see what interests you:
+  --   --
+  --   --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
+  --   --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
+  --   --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+  -- },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -936,6 +1253,8 @@ require('lazy').setup({
     },
   },
 })
+
+-- TODO: set vim.opt.colorcolumn when I open a file whose textwidth is set (or something)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

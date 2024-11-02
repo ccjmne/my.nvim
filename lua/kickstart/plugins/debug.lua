@@ -95,6 +95,16 @@ return {
       },
     }
 
+    dap.configurations.java = {
+      {
+        type = 'java',
+        request = 'attach',
+        name = 'Debug (Attach) - Remote',
+        hostName = '127.0.0.1',
+        port = 5005,
+      },
+    }
+
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
     dapui.setup {
