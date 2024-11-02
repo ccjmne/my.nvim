@@ -1,6 +1,3 @@
-vim.env.VIM = '/usr/bin/nvim'
-vim.env.PATH = '/usr/local/bin/gpg:' .. vim.env.PATH
-
 --[[
 
 What is Kickstart?
@@ -1032,7 +1029,6 @@ require('lazy').setup({
       custom_highlights = function(colors)
         -- C = require('catppuccin.palettes').get_palette 'mocha'
         -- U = require 'catppuccin.utils.colors'
-
         return {
           LineNr = { fg = colors.overlay2 },
           NonText = { fg = colors.mantle, bg = colors.text },
@@ -1043,20 +1039,6 @@ require('lazy').setup({
           TelescopePromptPrefix = { fg = colors.blue },
           TelescopeSelectionCaret = { fg = colors.yellow, bg = colors.surface0 },
           TelescopeTitle = { fg = colors.blue },
-
-          -- TelescopeBorder = { fg = colors.surface0, bg = colors.surface0 },
-          -- TelescopePromptBorder = { fg = colors.surface0, bg = colors.surface0 },
-          -- TelescopePromptNormal = { bg = colors.surface0 },
-          -- TelescopePromptPrefix = { fg = colors.mauve, bg = colors.surface0 },
-          -- TelescopePreviewTitle = { fg = colors.surface0, bg = colors.surface0 },
-          -- TelescopePromptTitle = { fg = colors.blue, bg = colors.surface0 },
-          -- TelescopeResultsTitle = { fg = colors.surface0, bg = colors.surface0 },
-          -- TelescopeSelection = { bg = colors.surface1 },
-
-          -- DiffAdd = { bg = U.darken(C.green, 0.50, C.base) },
-          -- DiffChange = { bg = U.darken(C.blue, 0.50, C.base) },
-          -- DiffDelete = { bg = U.darken(C.red, 0.50, C.base) },
-          -- DiffText = { bg = U.darken(C.blue, 0.50, C.base) },
         }
       end,
       show_end_of_buffer = true,
