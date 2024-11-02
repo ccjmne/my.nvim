@@ -219,27 +219,7 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
-  {
-    'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
-    config = function()
-      -- Define a toggle function for a detailed Fugitive commit view
-      vim.api.nvim_set_keymap('n', '<leader>gd', ':lua ToggleFugitiveDetailedView()<CR>', { noremap = true, silent = true })
-
-      function ToggleFugitiveDetailedView()
-        local current_buf = vim.fn.bufname '%'
-        -- Only apply if currently in a Fugitive buffer showing a commit
-        if current_buf:match '^fugitive://' then
-          -- Retrieve the current commit hash
-          local commit_hash = vim.fn.expand '%:t' -- Gets the file part of the fugitive buffer (commit hash)
-          print(commit_hash)
-          -- Reopen the same commit with additional signature and metadata details
-          vim.cmd('Gedit ' .. commit_hash .. ' --show-signature')
-        else
-          print 'Not in a Fugitive commit view.'
-        end
-      end
-    end,
-  },
+  'tpope/vim-fugitive', -- The premier Vim plugin for Git, or perhaps the other way around
 
   {
     'Wansmer/treesj',
