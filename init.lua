@@ -1033,6 +1033,7 @@ require('lazy').setup({
           LineNr = { fg = colors.overlay2 },
           NonText = { fg = colors.mantle, bg = colors.text },
           MiniTrailspace = { fg = colors.surface0, bg = colors.red },
+          MiniStatuslineInactive = { fg = colors.overlay2 },
           TelescopeBorder = { fg = colors.surface0 },
           TelescopeMultiSelection = { fg = colors.yellow },
           TelescopePromptBorder = { fg = colors.surface2 },
