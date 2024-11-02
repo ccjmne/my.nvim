@@ -503,14 +503,6 @@ require('lazy').setup({
 
   { 'nvim-java/nvim-java', ft = 'java' },
 
-  {
-    -- Garbage collector that stops inactive LSP clients to free RAM
-    'zeioth/garbage-day.nvim',
-    dependencies = 'neovim/nvim-lspconfig',
-    event = 'VeryLazy',
-    opts = {},
-  },
-
   -- LSP Plugins
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
